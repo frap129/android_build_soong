@@ -851,13 +851,13 @@ func stringSlice(s *[]string) []string {
 }
 
 func (c *deviceConfig) QTIAudioPath() string {
-	return String(c.config.productVariables.QTIAudioPath)
+	return String(c.config.productVariables.Carbon.QTIAudioPath)
 }
 
 func (c *deviceConfig) QTIDisplayPath() string {
-	return String(c.config.productVariables.QTIDisplayPath)
+	return String(c.config.productVariables.Carbon.QTIDisplayPath)
 }
 
 func (c *deviceConfig) QTIMediaPath() string {
-	return String(c.config.productVariables.QTIMediaPath)
+	return String(c.config.productVariables.Carbon.QTIMediaPath)
 }
