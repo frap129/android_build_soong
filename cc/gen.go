@@ -38,7 +38,7 @@ func init() {
 		return "prebuilts/build-tools/${config.HostPrebuiltTag}/bin/bison"
 	})
 
-	pctx.SourcePathVariable("lexCmd", "prebuilts/misc/${config.HostPrebuiltTag}/flex/flex-2.5.39")
+	pctx.SourcePathVariable("lexCmd", "prebuilts/build-tools/${config.HostPrebuiltTag}/bin/flex")
 	pctx.SourcePathVariable("yaccCmd", "${GetBisonPath}")
 	pctx.SourcePathVariable("yaccDataDir", "prebuilts/build-tools/common/bison")
 
