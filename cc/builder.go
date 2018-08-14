@@ -430,6 +430,7 @@ func TransformSourceToObj(ctx android.ModuleContext, subdir string, srcFiles and
 		ccDesc := ccCmd
 
 		var extraFlags string
+		var vendorFlags string
 		if flags.clang {
 			if flags.sdclang {
 				ccCmd = "${config.SDClangBin}/" + ccCmd
@@ -437,6 +438,7 @@ func TransformSourceToObj(ctx android.ModuleContext, subdir string, srcFiles and
 			} else {
 				ccCmd = "${config.ClangBin}/" + ccCmd
 			}
+			vendorFlags = " ${config.VendorClangFlags}"
 		} else {
 			ccCmd = gccCmd(flags.toolchain, ccCmd)
 		}
@@ -457,7 +459,7 @@ func TransformSourceToObj(ctx android.ModuleContext, subdir string, srcFiles and
 			Implicits:       cFlagsDeps,
 			OrderOnly:       pathDeps,
 			Args: map[string]string{
-				"cFlags": moduleCflags + extraFlags,
+				"cFlags": moduleCflags + extraFlags + vendorFlags,
 				"ccCmd":  ccCmd,
 			},
 		})
@@ -475,7 +477,7 @@ func TransformSourceToObj(ctx android.ModuleContext, subdir string, srcFiles and
 				// support exporting dependencies.
 				Implicit: objFile,
 				Args: map[string]string{
-					"cFlags":    moduleToolingCflags,
+					"cFlags":    moduleToolingCflags + extraFlags + vendorFlags,
 					"tidyFlags": flags.tidyFlags,
 				},
 			})
@@ -626,6 +628,7 @@ func TransformObjToDynamicBinary(ctx android.ModuleContext,
 
 	var ldCmd string
 	var extraFlags string
+	var vendorFlags string
 	if flags.clang {
 		if flags.sdclang {
 			ldCmd = "${config.SDClangBin}/clang++"
@@ -633,6 +636,7 @@ func TransformObjToDynamicBinary(ctx android.ModuleContext,
 		} else {
 			ldCmd = "${config.ClangBin}/clang++"
 		}
+		vendorFlags = " ${config.VendorClangFlags}"
 	} else {
 		ldCmd = gccCmd(flags.toolchain, "g++")
 	}
@@ -690,7 +694,7 @@ func TransformObjToDynamicBinary(ctx android.ModuleContext,
 			"ldCmd":    ldCmd,
 			"crtBegin": crtBegin.String(),
 			"libFlags": strings.Join(libFlagsList, " "),
-			"ldFlags":  flags.ldFlags + extraFlags,
+			"ldFlags":  flags.ldFlags + extraFlags + vendorFlags,
 			"crtEnd":   crtEnd.String(),
 		},
 	})
@@ -796,6 +800,7 @@ func TransformObjsToObj(ctx android.ModuleContext, objFiles android.Paths,
 
 	var ldCmd string
         var extraFlags string
+        var vendorFlags string
 	if flags.clang {
 		if flags.sdclang {
 			ldCmd = "${config.SDClangBin}/clang++"
@@ -803,6 +808,7 @@ func TransformObjsToObj(ctx android.ModuleContext, objFiles android.Paths,
 		} else {
 			ldCmd = "${config.ClangBin}/clang++"
 		}
+		extraFlags = " ${config.VendorClangFlags}"
 	} else {
 		ldCmd = gccCmd(flags.toolchain, "g++")
 	}
@@ -814,7 +820,7 @@ func TransformObjsToObj(ctx android.ModuleContext, objFiles android.Paths,
 		Inputs:      objFiles,
 		Args: map[string]string{
 			"ldCmd":   ldCmd,
-			"ldFlags": flags.ldFlags + extraFlags,
+			"ldFlags": flags.ldFlags + extraFlags + vendorFlags,
 		},
 	})
 }

@@ -238,6 +238,13 @@ func init() {
 		}
 		return ""
 	})
+
+	pctx.VariableFunc("VendorClangFlags", func(ctx android.PackageVarContext) string {
+		if override := ctx.Config().Getenv("VENDOR_CLANG_FLAGS"); override != "" {
+			return override
+		}
+		return ""
+	})
 }
 
 func setSdclangVars() {
