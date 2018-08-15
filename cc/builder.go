@@ -263,6 +263,8 @@ type builderFlags struct {
 	stripKeepSymbols       bool
 	stripKeepMiniDebugInfo bool
 	stripAddGnuDebuglink   bool
+
+	quicksilver bool
 }
 
 type Objects struct {
@@ -430,7 +432,11 @@ func TransformSourceToObj(ctx android.ModuleContext, subdir string, srcFiles and
 
 		var extraFlags string
 		if flags.clang {
-			ccCmd = "${config.ClangBin}/" + ccCmd
+			if ctx.Device() && flags.quicksilver {
+				ccCmd = "${config.QuicksilverBin}" + ccCmd
+			} else {
+				ccCmd = "${config.ClangBin}/" + ccCmd
+			}
 			extraFlags = " ${config.VendorClangFlags}"
 		} else {
 			ccCmd = gccCmd(flags.toolchain, ccCmd)
@@ -622,6 +628,9 @@ func TransformObjToDynamicBinary(ctx android.ModuleContext,
 	var ldCmd string
 	if flags.clang {
 		ldCmd = "${config.ClangBin}/clang++"
+		if ctx.Device() && flags.quicksilver {
+			ldCmd = "${config.QuicksilverBin}clang++"
+		}
 	} else {
 		ldCmd = gccCmd(flags.toolchain, "g++")
 	}
@@ -773,6 +782,9 @@ func TransformObjsToObj(ctx android.ModuleContext, objFiles android.Paths,
 	var ldCmd string
 	if flags.clang {
 		ldCmd = "${config.ClangBin}/clang++"
+		if ctx.Device() && flags.quicksilver {
+			ldCmd = "${config.QuicksilverBin}clang++"
+		}
 	} else {
 		ldCmd = gccCmd(flags.toolchain, "g++")
 	}

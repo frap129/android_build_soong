@@ -235,6 +235,13 @@ func init() {
 		}
 		return ""
 	})
+
+	pctx.VariableFunc("QuicksilverBin", func(ctx android.PackageVarContext) string {
+		if override := ctx.Config().Getenv("QUICKSILVER_BIN"); override != "" {
+			return override
+		}
+		return "${ClangBin}/"
+	})
 }
 
 var HostPrebuiltTag = pctx.VariableConfigMethod("HostPrebuiltTag", android.Config.PrebuiltOS)

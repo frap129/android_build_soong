@@ -146,6 +146,8 @@ type Flags struct {
 
 	GroupStaticLibs bool
 	ArGoldPlugin    bool // Whether LLVM gold plugin option is passed to llvm-ar
+
+	Quicksilver bool // Whether module supports Quicksilver or not
 }
 
 type ObjectLinkerProperties struct {
@@ -173,6 +175,9 @@ type BaseProperties struct {
 	// *.logtags files, to combine together in order to generate the /system/etc/event-log-tags
 	// file
 	Logtags []string
+
+	// Whether module supports Quicksilver or not
+	Quicksilver *bool `android:"arch_variant"`
 }
 
 type VendorProperties struct {
@@ -675,6 +680,7 @@ func (c *Module) GenerateAndroidBuildActions(actx android.ModuleContext) {
 	flags := Flags{
 		Toolchain: c.toolchain(ctx),
 		Clang:     c.clang(ctx),
+		Quicksilver: c.quicksilver(ctx),
 	}
 	if c.compiler != nil {
 		flags = c.compiler.compilerFlags(ctx, flags, deps)
@@ -1587,6 +1593,20 @@ func getCurrentNdkPrebuiltVersion(ctx DepsContext) string {
 		return strconv.Itoa(config.NdkMaxPrebuiltVersionInt)
 	}
 	return ctx.Config().PlatformSdkVersion()
+}
+
+func (c *Module) quicksilver(ctx BaseModuleContext) bool {
+	quicksilver := Bool(c.Properties.Quicksilver)
+
+	if !c.clang(ctx) {
+		quicksilver = false
+	}
+
+	if ctx.Host() {
+		quicksilver = false
+	}
+
+	return quicksilver
 }
 
 var Bool = proptools.Bool
