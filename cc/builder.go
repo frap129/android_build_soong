@@ -264,6 +264,8 @@ type builderFlags struct {
 	stripKeepSymbols       bool
 	stripKeepMiniDebugInfo bool
 	stripAddGnuDebuglink   bool
+
+	quicksilver bool
 }
 
 type Objects struct {
@@ -432,13 +434,19 @@ func TransformSourceToObj(ctx android.ModuleContext, subdir string, srcFiles and
 		var extraFlags string
 		var vendorFlags string
 		if flags.clang {
-			if flags.sdclang {
-				ccCmd = "${config.SDClangBin}/" + ccCmd
-				extraFlags = " ${config.SDClangFlags}"
-			} else {
-				ccCmd = "${config.ClangBin}/" + ccCmd
+			ccCmd = "${config.ClangBin}/" + ccCmd
+			if ctx.Device() {
+				if flags.quicksilver && flags.sdclang {
+					ccCmd = "${config.QuicksilverSDBin}" + ccCmd
+					extraFlags = " ${config.SDClangFlags}"
+				} else if flags.sdclang {
+					ccCmd = "${config.SDClangBin}/" + ccCmd
+					extraFlags = " ${config.SDClangFlags}"
+				} else if flags.quicksilver {
+					ccCmd = "${config.QuicksilverBin}/" + ccCmd
+				}
+				vendorFlags = " ${config.VendorClangFlags}"
 			}
-			vendorFlags = " ${config.VendorClangFlags}"
 		} else {
 			ccCmd = gccCmd(flags.toolchain, ccCmd)
 		}
@@ -630,13 +638,19 @@ func TransformObjToDynamicBinary(ctx android.ModuleContext,
 	var extraFlags string
 	var vendorFlags string
 	if flags.clang {
-		if flags.sdclang {
-			ldCmd = "${config.SDClangBin}/clang++"
-			extraFlags = " ${config.SDClangFlags}"
-		} else {
-			ldCmd = "${config.ClangBin}/clang++"
-		}
-		vendorFlags = " ${config.VendorClangFlags}"
+		ldCmd = "${config.ClangBin}/clang++"
+		if ctx.Device() {
+			if flags.quicksilver && flags.sdclang {
+				ldCmd = "${config.QuicksilverSDBin}/clang++"
+				extraFlags = " ${config.SDClangFlags}"
+			} else if flags.sdclang {
+				ldCmd = "${config.SDClangBin}/clang++"
+				extraFlags = " ${config.SDClangFlags}"
+			} else if flags.quicksilver {
+				ldCmd = "${config.QuicksilverBin}clang++"
+			}
+			vendorFlags = " ${config.VendorClangFlags}"
+                }
 	} else {
 		ldCmd = gccCmd(flags.toolchain, "g++")
 	}
@@ -802,13 +816,19 @@ func TransformObjsToObj(ctx android.ModuleContext, objFiles android.Paths,
         var extraFlags string
         var vendorFlags string
 	if flags.clang {
-		if flags.sdclang {
-			ldCmd = "${config.SDClangBin}/clang++"
-			extraFlags = " ${config.SDClangFlags}"
-		} else {
-			ldCmd = "${config.ClangBin}/clang++"
-		}
-		extraFlags = " ${config.VendorClangFlags}"
+		ldCmd = "${config.ClangBin}/clang++"
+		if ctx.Device() {
+			if flags.quicksilver && flags.sdclang {
+				ldCmd = "${config.QuicksilverSDBin}/clang++"
+				extraFlags = " ${config.SDClangFlags}"
+			} else if flags.sdclang {
+				ldCmd = "${config.SDClangBin}/clang++"
+				extraFlags = " ${config.SDClangFlags}"
+			} else if flags.quicksilver {
+				ldCmd = "${config.QuicksilverBin}clang++"
+			}
+			vendorFlags = " ${config.VendorClangFlags}"
+                }
 	} else {
 		ldCmd = gccCmd(flags.toolchain, "g++")
 	}

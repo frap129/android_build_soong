@@ -87,6 +87,8 @@ func flagsToBuilderFlags(in Flags) builderFlags {
 
 		groupStaticLibs: in.GroupStaticLibs,
 		arGoldPlugin:    in.ArGoldPlugin,
+
+		quicksilver:          in.Quicksilver,
 	}
 }
 

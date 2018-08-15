@@ -245,6 +245,20 @@ func init() {
 		}
 		return ""
 	})
+
+	pctx.VariableFunc("QuicksilverBin", func(ctx android.PackageVarContext) string {
+		if override := ctx.Config().Getenv("QUICKSILVER_BIN"); override != "" {
+			return override
+		}
+		return "${ClangBin}/"
+	})
+
+	pctx.VariableFunc("QuicksilverSDBin", func(ctx android.PackageVarContext) string {
+		if override := ctx.Config().Getenv("QUICKSILVER_SD_BIN"); override != "" {
+			return override
+		}
+		return "${SDClangBin}/"
+	})
 }
 
 func setSdclangVars() {
