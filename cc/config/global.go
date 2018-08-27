@@ -22,6 +22,8 @@ import (
 	"strings"
 
 	"android/soong/android"
+
+	"github.com/google/blueprint/bootstrap"
 )
 
 var (
@@ -116,7 +118,7 @@ var (
 
 	NdkMaxPrebuiltVersionInt = 27
 
-	SDClang                  = false
+	SDClang                  = useSdclang()
 
 	// prebuilts/clang default settings.
 	ClangDefaultBase         = "prebuilts/clang/host"
@@ -315,4 +317,17 @@ func replaceFirst(slice []string, from, to string) {
 		panic(fmt.Errorf("Expected %q, found %q", from, to))
 	}
 	slice[0] = to
+}
+
+func useSdclang() bool {
+	deviceConfig, err := android.NewConfig(".", bootstrap.BuildDir)
+	if err != nil {
+		return false
+	}
+
+        TargetUseSdclang :=  deviceConfig.ProductVariables.Carbon.Target_use_sdclang;
+	if TargetUseSdclang == nil {
+		return false
+	}
+	return *TargetUseSdclang;
 }
