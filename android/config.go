@@ -81,7 +81,7 @@ type VendorConfig interface {
 
 type config struct {
 	FileConfigurableOptions
-	productVariables productVariables
+	ProductVariables productVariables
 
 	// Only available on configs created by TestConfig
 	TestProductVariables *productVariables
@@ -133,7 +133,7 @@ func loadConfig(config *config) error {
 		return err
 	}
 
-	return loadFromConfigFile(&config.productVariables, config.ProductVariablesFileName)
+	return loadFromConfigFile(&config.ProductVariables, config.ProductVariablesFileName)
 }
 
 // loads configuration options from a JSON file in the cwd.
@@ -200,7 +200,7 @@ func saveToConfigFile(config jsonConfigurable, filename string) error {
 // TestConfig returns a Config object suitable for using for tests
 func TestConfig(buildDir string, env map[string]string) Config {
 	config := &config{
-		productVariables: productVariables{
+		ProductVariables: productVariables{
 			DeviceName:           stringPtr("test_device"),
 			Platform_sdk_version: intPtr(26),
 			AAPTConfig:           &[]string{"normal", "large", "xlarge", "hdpi", "xhdpi", "xxhdpi"},
@@ -216,7 +216,7 @@ func TestConfig(buildDir string, env map[string]string) Config {
 	config.deviceConfig = &deviceConfig{
 		config: config,
 	}
-	config.TestProductVariables = &config.productVariables
+	config.TestProductVariables = &config.ProductVariables
 
 	if err := config.fromEnv(); err != nil {
 		panic(err)
@@ -448,32 +448,32 @@ func (c *config) EmbeddedInMake() bool {
 }
 
 func (c *config) BuildId() string {
-	return String(c.productVariables.BuildId)
+	return String(c.ProductVariables.BuildId)
 }
 
 func (c *config) BuildNumberFromFile() string {
-	return String(c.productVariables.BuildNumberFromFile)
+	return String(c.ProductVariables.BuildNumberFromFile)
 }
 
 // DeviceName returns the name of the current device target
 // TODO: take an AndroidModuleContext to select the device name for multi-device builds
 func (c *config) DeviceName() string {
-	return *c.productVariables.DeviceName
+	return *c.ProductVariables.DeviceName
 }
 
 func (c *config) ResourceOverlays() []string {
-	if c.productVariables.ResourceOverlays == nil {
+	if c.ProductVariables.ResourceOverlays == nil {
 		return nil
 	}
-	return *c.productVariables.ResourceOverlays
+	return *c.ProductVariables.ResourceOverlays
 }
 
 func (c *config) PlatformVersionName() string {
-	return String(c.productVariables.Platform_version_name)
+	return String(c.ProductVariables.Platform_version_name)
 }
 
 func (c *config) PlatformSdkVersionInt() int {
-	return *c.productVariables.Platform_sdk_version
+	return *c.ProductVariables.Platform_sdk_version
 }
 
 func (c *config) PlatformSdkVersion() string {
@@ -481,7 +481,7 @@ func (c *config) PlatformSdkVersion() string {
 }
 
 func (c *config) PlatformSdkCodename() string {
-	return String(c.productVariables.Platform_sdk_codename)
+	return String(c.ProductVariables.Platform_sdk_codename)
 }
 
 func (c *config) MinSupportedSdkVersion() int {
@@ -489,7 +489,7 @@ func (c *config) MinSupportedSdkVersion() int {
 }
 
 func (c *config) DefaultAppTargetSdkInt() int {
-	if Bool(c.productVariables.Platform_sdk_final) {
+	if Bool(c.ProductVariables.Platform_sdk_final) {
 		return c.PlatformSdkVersionInt()
 	} else {
 		return FutureApiLevel
@@ -497,7 +497,7 @@ func (c *config) DefaultAppTargetSdkInt() int {
 }
 
 func (c *config) DefaultAppTargetSdk() string {
-	if Bool(c.productVariables.Platform_sdk_final) {
+	if Bool(c.ProductVariables.Platform_sdk_final) {
 		return c.PlatformSdkVersion()
 	} else {
 		return c.PlatformSdkCodename()
@@ -505,18 +505,18 @@ func (c *config) DefaultAppTargetSdk() string {
 }
 
 func (c *config) AppsDefaultVersionName() string {
-	return String(c.productVariables.AppsDefaultVersionName)
+	return String(c.ProductVariables.AppsDefaultVersionName)
 }
 
 // Codenames that are active in the current lunch target.
 func (c *config) PlatformVersionActiveCodenames() []string {
-	return c.productVariables.Platform_version_active_codenames
+	return c.ProductVariables.Platform_version_active_codenames
 }
 
 // Codenames that are available in the branch but not included in the current
 // lunch target.
 func (c *config) PlatformVersionFutureCodenames() []string {
-	return c.productVariables.Platform_version_future_codenames
+	return c.ProductVariables.Platform_version_future_codenames
 }
 
 // All possible codenames in the current branch. NB: Not named AllCodenames
@@ -530,23 +530,23 @@ func (c *config) PlatformVersionCombinedCodenames() []string {
 }
 
 func (c *config) ProductAAPTConfig() []string {
-	return stringSlice(c.productVariables.AAPTConfig)
+	return stringSlice(c.ProductVariables.AAPTConfig)
 }
 
 func (c *config) ProductAAPTPreferredConfig() string {
-	return String(c.productVariables.AAPTPreferredConfig)
+	return String(c.ProductVariables.AAPTPreferredConfig)
 }
 
 func (c *config) ProductAAPTCharacteristics() string {
-	return String(c.productVariables.AAPTCharacteristics)
+	return String(c.ProductVariables.AAPTCharacteristics)
 }
 
 func (c *config) ProductAAPTPrebuiltDPI() []string {
-	return stringSlice(c.productVariables.AAPTPrebuiltDPI)
+	return stringSlice(c.ProductVariables.AAPTPrebuiltDPI)
 }
 
 func (c *config) DefaultAppCertificateDir(ctx PathContext) SourcePath {
-	defaultCert := String(c.productVariables.DefaultAppCertificate)
+	defaultCert := String(c.ProductVariables.DefaultAppCertificate)
 	if defaultCert != "" {
 		return PathForSource(ctx, filepath.Dir(defaultCert))
 	} else {
@@ -555,7 +555,7 @@ func (c *config) DefaultAppCertificateDir(ctx PathContext) SourcePath {
 }
 
 func (c *config) DefaultAppCertificate(ctx PathContext) (pem, key SourcePath) {
-	defaultCert := String(c.productVariables.DefaultAppCertificate)
+	defaultCert := String(c.ProductVariables.DefaultAppCertificate)
 	if defaultCert != "" {
 		return PathForSource(ctx, defaultCert+".x509.pem"), PathForSource(ctx, defaultCert+".pk8")
 	} else {
@@ -565,23 +565,23 @@ func (c *config) DefaultAppCertificate(ctx PathContext) (pem, key SourcePath) {
 }
 
 func (c *config) AllowMissingDependencies() bool {
-	return Bool(c.productVariables.Allow_missing_dependencies)
+	return Bool(c.ProductVariables.Allow_missing_dependencies)
 }
 
 func (c *config) UnbundledBuild() bool {
-	return Bool(c.productVariables.Unbundled_build)
+	return Bool(c.ProductVariables.Unbundled_build)
 }
 
 func (c *config) IsPdkBuild() bool {
-	return Bool(c.productVariables.Pdk)
+	return Bool(c.ProductVariables.Pdk)
 }
 
 func (c *config) MinimizeJavaDebugInfo() bool {
-	return Bool(c.productVariables.MinimizeJavaDebugInfo) && !Bool(c.productVariables.Eng)
+	return Bool(c.ProductVariables.MinimizeJavaDebugInfo) && !Bool(c.ProductVariables.Eng)
 }
 
 func (c *config) DevicePrefer32BitExecutables() bool {
-	return Bool(c.productVariables.DevicePrefer32BitExecutables)
+	return Bool(c.ProductVariables.DevicePrefer32BitExecutables)
 }
 
 func (c *config) SkipDeviceInstall() bool {
@@ -594,26 +594,26 @@ func (c *config) SkipMegaDeviceInstall(path string) bool {
 }
 
 func (c *config) SanitizeHost() []string {
-	return append([]string(nil), c.productVariables.SanitizeHost...)
+	return append([]string(nil), c.ProductVariables.SanitizeHost...)
 }
 
 func (c *config) SanitizeDevice() []string {
-	return append([]string(nil), c.productVariables.SanitizeDevice...)
+	return append([]string(nil), c.ProductVariables.SanitizeDevice...)
 }
 
 func (c *config) SanitizeDeviceDiag() []string {
-	return append([]string(nil), c.productVariables.SanitizeDeviceDiag...)
+	return append([]string(nil), c.ProductVariables.SanitizeDeviceDiag...)
 }
 
 func (c *config) SanitizeDeviceArch() []string {
-	return append([]string(nil), c.productVariables.SanitizeDeviceArch...)
+	return append([]string(nil), c.ProductVariables.SanitizeDeviceArch...)
 }
 
 func (c *config) EnableCFI() bool {
-	if c.productVariables.EnableCFI == nil {
+	if c.ProductVariables.EnableCFI == nil {
 		return true
 	} else {
-		return *c.productVariables.EnableCFI
+		return *c.ProductVariables.EnableCFI
 	}
 }
 
@@ -632,7 +632,7 @@ func (c *config) UseD8Desugar() bool {
 }
 
 func (c *config) UseGoma() bool {
-	return Bool(c.productVariables.UseGoma)
+	return Bool(c.ProductVariables.UseGoma)
 }
 
 // Returns true if OpenJDK9 prebuilts are being used
@@ -646,14 +646,14 @@ func (c *config) TargetOpenJDK9() bool {
 }
 
 func (c *config) ClangTidy() bool {
-	return Bool(c.productVariables.ClangTidy)
+	return Bool(c.ProductVariables.ClangTidy)
 }
 
 func (c *config) TidyChecks() string {
-	if c.productVariables.TidyChecks == nil {
+	if c.ProductVariables.TidyChecks == nil {
 		return ""
 	}
-	return *c.productVariables.TidyChecks
+	return *c.ProductVariables.TidyChecks
 }
 
 func (c *config) LibartImgHostBaseAddress() string {
@@ -661,9 +661,9 @@ func (c *config) LibartImgHostBaseAddress() string {
 }
 
 func (c *config) LibartImgDeviceBaseAddress() string {
-	if c.productVariables.Libart_img_base != nil &&
-		*c.productVariables.Libart_img_base != "" {
-		return *c.productVariables.Libart_img_base
+	if c.ProductVariables.Libart_img_base != nil &&
+		*c.ProductVariables.Libart_img_base != "" {
+		return *c.ProductVariables.Libart_img_base
 	}
 	archType := Common
 	if len(c.Targets[Device]) > 0 {
@@ -678,11 +678,11 @@ func (c *config) LibartImgDeviceBaseAddress() string {
 }
 
 func (c *config) ArtUseReadBarrier() bool {
-	return Bool(c.productVariables.ArtUseReadBarrier)
+	return Bool(c.ProductVariables.ArtUseReadBarrier)
 }
 
 func (c *config) EnforceRROForModule(name string) bool {
-	enforceList := c.productVariables.EnforceRROTargets
+	enforceList := c.ProductVariables.EnforceRROTargets
 	if enforceList != nil {
 		if len(*enforceList) == 1 && (*enforceList)[0] == "*" {
 			return true
@@ -693,7 +693,7 @@ func (c *config) EnforceRROForModule(name string) bool {
 }
 
 func (c *config) EnforceRROExcludedOverlay(path string) bool {
-	excluded := c.productVariables.EnforceRROExcludedOverlays
+	excluded := c.ProductVariables.EnforceRROExcludedOverlays
 	if excluded != nil {
 		for _, exclude := range *excluded {
 			if strings.HasPrefix(path, exclude) {
@@ -705,11 +705,11 @@ func (c *config) EnforceRROExcludedOverlay(path string) bool {
 }
 
 func (c *config) ExportedNamespaces() []string {
-	return append([]string(nil), c.productVariables.NamespacesToExport...)
+	return append([]string(nil), c.ProductVariables.NamespacesToExport...)
 }
 
 func (c *config) HostStaticBinaries() bool {
-	return Bool(c.productVariables.HostStaticBinaries)
+	return Bool(c.ProductVariables.HostStaticBinaries)
 }
 
 func (c *deviceConfig) Arches() []Arch {
@@ -721,7 +721,7 @@ func (c *deviceConfig) Arches() []Arch {
 }
 
 func (c *deviceConfig) BinderBitness() string {
-	is32BitBinder := c.config.productVariables.Binder32bit
+	is32BitBinder := c.config.ProductVariables.Binder32bit
 	if is32BitBinder != nil && *is32BitBinder {
 		return "32"
 	}
@@ -729,74 +729,74 @@ func (c *deviceConfig) BinderBitness() string {
 }
 
 func (c *deviceConfig) VendorPath() string {
-	if c.config.productVariables.VendorPath != nil {
-		return *c.config.productVariables.VendorPath
+	if c.config.ProductVariables.VendorPath != nil {
+		return *c.config.ProductVariables.VendorPath
 	}
 	return "vendor"
 }
 
 func (c *deviceConfig) VndkVersion() string {
-	return String(c.config.productVariables.DeviceVndkVersion)
+	return String(c.config.ProductVariables.DeviceVndkVersion)
 }
 
 func (c *deviceConfig) PlatformVndkVersion() string {
-	return String(c.config.productVariables.Platform_vndk_version)
+	return String(c.config.ProductVariables.Platform_vndk_version)
 }
 
 func (c *deviceConfig) ExtraVndkVersions() []string {
-	return c.config.productVariables.ExtraVndkVersions
+	return c.config.ProductVariables.ExtraVndkVersions
 }
 
 func (c *deviceConfig) SystemSdkVersions() []string {
-	if c.config.productVariables.DeviceSystemSdkVersions == nil {
+	if c.config.ProductVariables.DeviceSystemSdkVersions == nil {
 		return nil
 	}
-	return *c.config.productVariables.DeviceSystemSdkVersions
+	return *c.config.ProductVariables.DeviceSystemSdkVersions
 }
 
 func (c *deviceConfig) PlatformSystemSdkVersions() []string {
-	return c.config.productVariables.Platform_systemsdk_versions
+	return c.config.ProductVariables.Platform_systemsdk_versions
 }
 
 func (c *deviceConfig) OdmPath() string {
-	if c.config.productVariables.OdmPath != nil {
-		return *c.config.productVariables.OdmPath
+	if c.config.ProductVariables.OdmPath != nil {
+		return *c.config.ProductVariables.OdmPath
 	}
 	return "odm"
 }
 
 func (c *deviceConfig) ProductPath() string {
-	if c.config.productVariables.ProductPath != nil {
-		return *c.config.productVariables.ProductPath
+	if c.config.ProductVariables.ProductPath != nil {
+		return *c.config.ProductVariables.ProductPath
 	}
 	return "product"
 }
 
 func (c *deviceConfig) BtConfigIncludeDir() string {
-	return String(c.config.productVariables.BtConfigIncludeDir)
+	return String(c.config.ProductVariables.BtConfigIncludeDir)
 }
 
 func (c *deviceConfig) DeviceKernelHeaderDirs() []string {
-	return c.config.productVariables.DeviceKernelHeaders
+	return c.config.ProductVariables.DeviceKernelHeaders
 }
 
 func (c *deviceConfig) SpecificCameraParametersLibrary() string {
-	return String(c.config.productVariables.Carbon.Specific_camera_parameter_library)
+	return String(c.config.ProductVariables.Carbon.Specific_camera_parameter_library)
 }
 
 func (c *deviceConfig) NativeCoverageEnabled() bool {
-	return Bool(c.config.productVariables.NativeCoverage)
+	return Bool(c.config.ProductVariables.NativeCoverage)
 }
 
 func (c *deviceConfig) CoverageEnabledForPath(path string) bool {
 	coverage := false
-	if c.config.productVariables.CoveragePaths != nil {
-		if PrefixInList(path, *c.config.productVariables.CoveragePaths) {
+	if c.config.ProductVariables.CoveragePaths != nil {
+		if PrefixInList(path, *c.config.ProductVariables.CoveragePaths) {
 			coverage = true
 		}
 	}
-	if coverage && c.config.productVariables.CoverageExcludePaths != nil {
-		if PrefixInList(path, *c.config.productVariables.CoverageExcludePaths) {
+	if coverage && c.config.ProductVariables.CoverageExcludePaths != nil {
+		if PrefixInList(path, *c.config.ProductVariables.CoverageExcludePaths) {
 			coverage = false
 		}
 	}
@@ -804,32 +804,32 @@ func (c *deviceConfig) CoverageEnabledForPath(path string) bool {
 }
 
 func (c *deviceConfig) PgoAdditionalProfileDirs() []string {
-	return c.config.productVariables.PgoAdditionalProfileDirs
+	return c.config.ProductVariables.PgoAdditionalProfileDirs
 }
 
 func (c *config) IntegerOverflowDisabledForPath(path string) bool {
-	if c.productVariables.IntegerOverflowExcludePaths == nil {
+	if c.ProductVariables.IntegerOverflowExcludePaths == nil {
 		return false
 	}
-	return PrefixInList(path, *c.productVariables.IntegerOverflowExcludePaths)
+	return PrefixInList(path, *c.ProductVariables.IntegerOverflowExcludePaths)
 }
 
 func (c *config) CFIDisabledForPath(path string) bool {
-	if c.productVariables.CFIExcludePaths == nil {
+	if c.ProductVariables.CFIExcludePaths == nil {
 		return false
 	}
-	return PrefixInList(path, *c.productVariables.CFIExcludePaths)
+	return PrefixInList(path, *c.ProductVariables.CFIExcludePaths)
 }
 
 func (c *config) CFIEnabledForPath(path string) bool {
-	if c.productVariables.CFIIncludePaths == nil {
+	if c.ProductVariables.CFIIncludePaths == nil {
 		return false
 	}
-	return PrefixInList(path, *c.productVariables.CFIIncludePaths)
+	return PrefixInList(path, *c.ProductVariables.CFIIncludePaths)
 }
 
 func (c *config) VendorConfig(name string) VendorConfig {
-	return vendorConfig(c.productVariables.VendorVars[name])
+	return vendorConfig(c.ProductVariables.VendorVars[name])
 }
 
 func (c vendorConfig) Bool(name string) bool {
@@ -855,13 +855,13 @@ func stringSlice(s *[]string) []string {
 }
 
 func (c *deviceConfig) QTIAudioPath() string {
-	return String(c.config.productVariables.Carbon.QTIAudioPath)
+	return String(c.config.ProductVariables.Carbon.QTIAudioPath)
 }
 
 func (c *deviceConfig) QTIDisplayPath() string {
-	return String(c.config.productVariables.Carbon.QTIDisplayPath)
+	return String(c.config.ProductVariables.Carbon.QTIDisplayPath)
 }
 
 func (c *deviceConfig) QTIMediaPath() string {
-	return String(c.config.productVariables.Carbon.QTIMediaPath)
+	return String(c.config.ProductVariables.Carbon.QTIMediaPath)
 }

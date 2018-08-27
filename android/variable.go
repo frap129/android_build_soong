@@ -310,7 +310,7 @@ func variableMutator(mctx BottomUpMutatorContext) {
 	a := module.base()
 	variableValues := reflect.ValueOf(&a.variableProperties.Product_variables).Elem()
 	zeroValues := reflect.ValueOf(zeroProductVariables.Product_variables)
-	valStruct := reflect.ValueOf(mctx.Config().productVariables)
+	valStruct := reflect.ValueOf(mctx.Config().ProductVariables)
 
 	doVariableMutation(mctx, a, variableValues, zeroValues, valStruct)
 
