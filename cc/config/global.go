@@ -191,20 +191,8 @@ func init() {
 		}
 		return "${ClangBin}/"
 	})
-	pctx.VariableFunc("SDClangBin2", func(ctx android.PackageVarContext) string {
-		if override := ctx.Config().Getenv("SDCLANG_PATH_2"); override != "" {
-			return override
-		}
-		return "${ClangBin}/"
-	})
 	pctx.VariableFunc("SDClangFlags", func(ctx android.PackageVarContext) string {
 		if override := ctx.Config().Getenv("SDCLANG_COMMON_FLAGS"); override != "" {
-			return override
-		}
-		return ""
-	})
-	pctx.VariableFunc("SDClangFlags2", func(ctx android.PackageVarContext) string {
-		if override := ctx.Config().Getenv("SDCLANG_COMMON_FLAGS_2"); override != "" {
 			return override
 		}
 		return ""
